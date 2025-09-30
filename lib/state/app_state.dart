@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/notification_mock.dart';
 import '../services/escalation_mock.dart';
+import '../services/firebase_auth_service.dart';
+import '../firebase_options.dart';
 
 class AppState {
   AppState._internal();
@@ -23,8 +27,23 @@ class AppState {
 
   final Random _rnd = Random();
   Timer? _telemetryTimer;
+  final FirebaseAuthService _authService = FirebaseAuthService();
+  StreamSubscription<User?>? _authSubscription;
 
-  void initialize() {
+  Future<void> initialize() async {
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // Listen to auth state changes
+    _authSubscription = _authService.authStateChanges.listen((User? user) {
+      if (user != null) {
+        _loadUserData(user.uid);
+      } else {
+        currentUser.value = null;
+      }
+    });
     users['pt_sara'] = {
       'uid': 'pt_sara',
       'name': 'Sara Abdallah',
@@ -97,57 +116,88 @@ class AppState {
         Timer.periodic(const Duration(seconds: 3), (_) => _emitTelemetry());
   }
 
+  Future<void> _loadUserData(String uid) async {
+    try {
+      final userData = await _authService.getUserData(uid);
+      if (userData != null) {
+        currentUser.value = userData;
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
+  }
+
   void dispose() {
     _telemetryTimer?.cancel();
+    _authSubscription?.cancel();
   }
 
   Future<bool> signIn(String email, String password) async {
-    await Future.delayed(const Duration(milliseconds: 200));
     try {
-      final user = users.values.firstWhere(
-          (u) => (u['email'] as String).toLowerCase() == email.toLowerCase());
-      currentUser.value = Map<String, dynamic>.from(user);
-      return true;
+      final userData = await _authService.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (userData != null) {
+        currentUser.value = userData;
+        return true;
+      }
+      return false;
     } catch (e) {
+      print('Sign in error: $e');
       return false;
     }
   }
 
   Future<Map<String, dynamic>> signUp(
       String name, String email, String password, String role) async {
-    final uid = 'u_${DateTime.now().millisecondsSinceEpoch}';
-    final user = {'uid': uid, 'name': name, 'email': email, 'role': role};
-    users[uid] = user;
-    currentUser.value = Map<String, dynamic>.from(user);
-    if (role == 'patient') {
-      vitals.value = {
-        'eeg': 'normal',
-        'heartRate': 72,
-        'spo2': 97,
-        'motion': 'stable',
-        'score': 0.02,
-        'history_hr': List.generate(30, (_) => 60 + _rnd.nextInt(40)),
-        'history_spo2': List.generate(30, (_) => 90 + _rnd.nextInt(6)),
-        'lastUpdated': DateTime.now().toIso8601String(),
-      };
-      events.value = [];
+    try {
+      final userData = await _authService.signUpWithEmailAndPassword(
+        name: name,
+        email: email,
+        password: password,
+        role: role,
+      );
+      if (userData != null) {
+        currentUser.value = userData;
+        if (role == 'patient') {
+          vitals.value = {
+            'eeg': 'normal',
+            'heartRate': 72,
+            'spo2': 97,
+            'motion': 'stable',
+            'score': 0.02,
+            'history_hr': List.generate(30, (_) => 60 + _rnd.nextInt(40)),
+            'history_spo2': List.generate(30, (_) => 90 + _rnd.nextInt(6)),
+            'lastUpdated': DateTime.now().toIso8601String(),
+          };
+          events.value = [];
+        }
+        return userData;
+      }
+      throw 'فشل في إنشاء الحساب';
+    } catch (e) {
+      throw e.toString();
     }
-    await Future.delayed(const Duration(milliseconds: 200));
-    return user;
   }
 
-  void signOut() {
-    currentUser.value = null;
-    vitals.value = {
-      'eeg': 'normal',
-      'heartRate': 74,
-      'spo2': 97,
-      'motion': 'stable',
-      'score': 0.03,
-      'history_hr': List.generate(30, (_) => 60 + _rnd.nextInt(50)),
-      'history_spo2': List.generate(30, (_) => 90 + _rnd.nextInt(8)),
-      'lastUpdated': DateTime.now().toIso8601String(),
-    };
+  Future<void> signOut() async {
+    try {
+      await _authService.signOut();
+      currentUser.value = null;
+      vitals.value = {
+        'eeg': 'normal',
+        'heartRate': 74,
+        'spo2': 97,
+        'motion': 'stable',
+        'score': 0.03,
+        'history_hr': List.generate(30, (_) => 60 + _rnd.nextInt(50)),
+        'history_spo2': List.generate(30, (_) => 90 + _rnd.nextInt(8)),
+        'lastUpdated': DateTime.now().toIso8601String(),
+      };
+    } catch (e) {
+      print('Sign out error: $e');
+    }
   }
 
   Future<void> pushEvent(Map<String, dynamic> event) async {
