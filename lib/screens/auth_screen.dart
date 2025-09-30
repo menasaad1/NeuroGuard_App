@@ -572,34 +572,38 @@ class _SignupWidgetState extends State<SignupWidget> {
                         return DropdownMenuItem(
                           value: role,
                           child: Container(
-                            constraints: const BoxConstraints(maxWidth: 300),
+                            constraints: const BoxConstraints(maxWidth: 280),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   _getRoleIcon(role),
                                   color: _getRoleColor(role),
-                                  size: 20,
+                                  size: 18,
                                 ),
-                                const SizedBox(width: 8),
-                                Flexible(
+                                const SizedBox(width: 6),
+                                Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         UserManagementService.getRoleDisplayName(role),
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                       ),
                                       Text(
                                         UserManagementService.getRoleDescription(role),
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 10,
                                           color: Colors.grey[600],
                                         ),
                                         overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
+                                        maxLines: 1,
                                       ),
                                     ],
                                   ),

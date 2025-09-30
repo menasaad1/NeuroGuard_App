@@ -98,8 +98,10 @@ class FirebaseAuthService {
       }
       return null;
     } on FirebaseAuthException catch (e) {
+      print('Firebase Auth Error: ${e.code} - ${e.message}');
       throw _handleAuthException(e);
     } catch (e) {
+      print('General Error: $e');
       throw Exception('حدث خطأ غير متوقع: $e');
     }
   }

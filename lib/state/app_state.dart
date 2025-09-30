@@ -152,6 +152,17 @@ class AppState {
   Future<Map<String, dynamic>> signUp(
       String name, String email, String password, String role) async {
     try {
+      // Validate inputs
+      if (name.trim().isEmpty) {
+        throw Exception('يرجى إدخال الاسم الكامل');
+      }
+      if (email.trim().isEmpty || !email.contains('@')) {
+        throw Exception('يرجى إدخال بريد إلكتروني صحيح');
+      }
+      if (password.length < 6) {
+        throw Exception('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      }
+      
       final userData = await _authService.signUpWithEmailAndPassword(
         name: name,
         email: email,
@@ -182,7 +193,16 @@ class AppState {
       throw Exception('فشل في إنشاء الحساب');
     } catch (e) {
       print('Sign up error: $e');
-      rethrow;
+      // Return a more user-friendly error message
+      if (e.toString().contains('email-already-in-use')) {
+        throw Exception('هذا البريد الإلكتروني مستخدم بالفعل');
+      } else if (e.toString().contains('weak-password')) {
+        throw Exception('كلمة المرور ضعيفة جداً');
+      } else if (e.toString().contains('invalid-email')) {
+        throw Exception('البريد الإلكتروني غير صحيح');
+      } else {
+        throw Exception('حدث خطأ في إنشاء الحساب: ${e.toString()}');
+      }
     }
   }
 
