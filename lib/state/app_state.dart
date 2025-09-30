@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../services/notification_mock.dart';
 import '../services/escalation_mock.dart';
-import '../services/firebase_auth_service.dart';
-import '../firebase_options.dart';
+import '../services/mock_auth_service.dart';
 
 class AppState {
   AppState._internal();
@@ -27,19 +24,19 @@ class AppState {
 
   final Random _rnd = Random();
   Timer? _telemetryTimer;
-  final FirebaseAuthService _authService = FirebaseAuthService();
-  StreamSubscription<User?>? _authSubscription;
+  final MockAuthService _authService = MockAuthService();
+  StreamSubscription<Map<String, dynamic>?>? _authSubscription;
 
   Future<void> initialize() async {
-    // Initialize Firebase
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    // Initialize Firebase (commented out for now to avoid compilation issues)
+    // await Firebase.initializeApp(
+    //   options: DefaultFirebaseOptions.currentPlatform,
+    // );
 
     // Listen to auth state changes
-    _authSubscription = _authService.authStateChanges.listen((User? user) {
+    _authSubscription = _authService.authStateChanges.listen((Map<String, dynamic>? user) {
       if (user != null) {
-        _loadUserData(user.uid);
+        currentUser.value = user;
       } else {
         currentUser.value = null;
       }
