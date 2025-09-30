@@ -248,6 +248,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
+                      alignment: WrapAlignment.center,
                       children: [
                         _buildDemoButton(
                           'مريض (سارة)',
@@ -298,19 +299,27 @@ class _LoginWidgetState extends State<LoginWidget> {
   }
 
   Widget _buildDemoButton(String text, VoidCallback onPressed, Color color) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minWidth: 80,
+        maxWidth: 150,
       ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 12),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 11),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
   }
@@ -562,34 +571,41 @@ class _SignupWidgetState extends State<SignupWidget> {
                       items: UserManagementService.availableRoles.map((role) {
                         return DropdownMenuItem(
                           value: role,
-                          child: Row(
-                            children: [
-                              Icon(
-                                _getRoleIcon(role),
-                                color: _getRoleColor(role),
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      UserManagementService.getRoleDisplayName(role),
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      UserManagementService.getRoleDescription(role),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 300),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _getRoleIcon(role),
+                                  color: _getRoleColor(role),
+                                  size: 20,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        UserManagementService.getRoleDisplayName(role),
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        UserManagementService.getRoleDescription(role),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       }).toList(),

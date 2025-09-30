@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'web_config.dart';
 import 'state/app_state.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth_screen.dart';
@@ -11,6 +12,9 @@ import 'screens/admin/admin_home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Configure web renderer
+  WebConfig.configureWebRenderer();
   
   // Initialize Firebase
   await Firebase.initializeApp(
