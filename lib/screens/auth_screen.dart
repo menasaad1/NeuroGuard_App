@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../state/app_state.dart';
 import '../services/user_management_service.dart';
 import '../services/language_service.dart';
+import '../utils/text_utils.dart';
 import 'language_settings_screen.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -438,6 +439,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                 controller: nameC,
                 textDirection: TextDirection.rtl,
                 textAlign: TextAlign.right,
+                style: TextUtils.getSafeTextStyle(),
                 decoration: InputDecoration(
                   labelText: 'الاسم الكامل',
                   prefixIcon: const Icon(Icons.person_outlined),
