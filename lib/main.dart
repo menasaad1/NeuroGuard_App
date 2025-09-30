@@ -4,9 +4,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'web_config.dart';
 import 'l10n/l10n.dart';
+import 'services/language_service.dart';
 import 'state/app_state.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth_screen.dart';
+import 'screens/language_settings_screen.dart';
 import 'screens/patient/patient_home.dart';
 import 'screens/caregiver/caregiver_home.dart';
 import 'screens/clinician/clinician_home.dart';
@@ -22,6 +24,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  // Initialize language service
+  await LanguageService().initialize();
   
   AppState.instance.initialize();
   runApp(const NeuroGuardApp());
@@ -47,7 +52,7 @@ class _NeuroGuardAppState extends State<NeuroGuardApp> {
       title: 'NeuroGuard',
       debugShowCheckedModeBanner: false,
       themeMode: _dark ? ThemeMode.dark : ThemeMode.light,
-      locale: const Locale('en', 'US'), // Use English as default to avoid localization issues
+      locale: LanguageService().currentLocale.value,
       supportedLocales: L10n.supportedLocales,
       localizationsDelegates: L10n.localizationsDelegates,
       localeResolutionCallback: L10n.localeResolutionCallback,
@@ -56,12 +61,22 @@ class _NeuroGuardAppState extends State<NeuroGuardApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         scaffoldBackgroundColor: Colors.grey[50],
         fontFamily: 'Arial', // Use Arial for better Arabic support
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontFamily: 'Arial'),
+          bodyMedium: TextStyle(fontFamily: 'Arial'),
+          bodySmall: TextStyle(fontFamily: 'Arial'),
+        ),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.teal, brightness: Brightness.dark),
         fontFamily: 'Arial', // Use Arial for better Arabic support
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontFamily: 'Arial'),
+          bodyMedium: TextStyle(fontFamily: 'Arial'),
+          bodySmall: TextStyle(fontFamily: 'Arial'),
+        ),
       ),
       home: Builder(builder: (ctx) {
         if (!_seenOnboarding) {

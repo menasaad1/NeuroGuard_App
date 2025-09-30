@@ -41,12 +41,14 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBvQ2X8Y9Z1A2B3C4D5E6F7G8H9I0J1K2L',
-    appId: '1:123456789012:web:abcdef1234567890abcdef',
-    messagingSenderId: '123456789012',
-    projectId: 'neuroguard-app',
-    authDomain: 'neuroguard-app.firebaseapp.com',
-    storageBucket: 'neuroguard-app.appspot.com',
+  apiKey: "AIzaSyB7ZoWbyTEsmB396UAB5pQs2uYxdw_Vo3c",
+  authDomain: "neuroguard-82e63.firebaseapp.com",
+  databaseURL: "https://neuroguard-82e63-default-rtdb.firebaseio.com",
+  projectId: "neuroguard-82e63",
+  storageBucket: "neuroguard-82e63.firebasestorage.app",
+  messagingSenderId: "470690299791",
+  appId: "1:470690299791:web:ef0f0b2a798a9f7e9995fa"
+
   );
 
   static const FirebaseOptions android = FirebaseOptions(

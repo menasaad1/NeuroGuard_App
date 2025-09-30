@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
 import '../services/user_management_service.dart';
+import '../services/language_service.dart';
+import 'language_settings_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -72,9 +74,23 @@ class _LoginWidgetState extends State<LoginWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NeuroGuard - تسجيل الدخول'),
+        title: Text(
+          LanguageService().isArabic ? 'NeuroGuard - تسجيل الدخول' : 'NeuroGuard - Login',
+          style: const TextStyle(fontFamily: 'Arial'),
+        ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const LanguageSettingsScreen(),
+                ),
+              );
+            },
+            tooltip: LanguageService().isArabic ? 'تغيير اللغة' : 'Change Language',
+          ),
           IconButton(
               icon: const Icon(Icons.brightness_6),
               onPressed: widget.onToggleTheme)
@@ -421,6 +437,7 @@ class _SignupWidgetState extends State<SignupWidget> {
               TextFormField(
                 controller: nameC,
                 textDirection: TextDirection.rtl,
+                textAlign: TextAlign.right,
                 decoration: InputDecoration(
                   labelText: 'الاسم الكامل',
                   prefixIcon: const Icon(Icons.person_outlined),

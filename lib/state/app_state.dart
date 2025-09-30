@@ -208,8 +208,13 @@ class AppState {
 
   Future<void> signOut() async {
     try {
+      // Clear Firebase auth state
       await _authService.signOut();
+      
+      // Clear local state
       currentUser.value = null;
+      
+      // Reset vitals to default
       vitals.value = {
         'eeg': 'normal',
         'heartRate': 74,
@@ -220,8 +225,18 @@ class AppState {
         'history_spo2': List.generate(30, (_) => 90 + _rnd.nextInt(8)),
         'lastUpdated': DateTime.now().toIso8601String(),
       };
+      
+      // Clear events
+      events.value = [];
+      
+      // Cancel any ongoing timers
+      _telemetryTimer?.cancel();
+      
+      print('User signed out successfully');
     } catch (e) {
       print('Sign out error: $e');
+      // Force clear local state even if Firebase signOut fails
+      currentUser.value = null;
     }
   }
 
