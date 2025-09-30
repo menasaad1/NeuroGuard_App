@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'web_config.dart';
+import 'l10n/l10n.dart';
 import 'state/app_state.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth_screen.dart';
@@ -45,11 +47,10 @@ class _NeuroGuardAppState extends State<NeuroGuardApp> {
       title: 'NeuroGuard',
       debugShowCheckedModeBanner: false,
       themeMode: _dark ? ThemeMode.dark : ThemeMode.light,
-      locale: const Locale('ar', 'EG'), // Set Arabic locale
-      supportedLocales: const [
-        Locale('ar', 'EG'), // Arabic
-        Locale('en', 'US'), // English
-      ],
+      locale: const Locale('en', 'US'), // Use English as default to avoid localization issues
+      supportedLocales: L10n.supportedLocales,
+      localizationsDelegates: L10n.localizationsDelegates,
+      localeResolutionCallback: L10n.localeResolutionCallback,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
