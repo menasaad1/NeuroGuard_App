@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../services/user_management_service.dart';
 import '../utils/language_manager.dart';
@@ -6,59 +7,71 @@ import '../utils/safe_text_field.dart';
 
 class AuthScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
-  const AuthScreen({Key? key, required this.onToggleTheme}) : super(key: key);
+
+  const AuthScreen({super.key, required this.onToggleTheme});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool _showLogin = true;
-
-  void _toggle() => setState(() => _showLogin = !_showLogin);
+  bool _isLogin = true;
 
   @override
   Widget build(BuildContext context) {
-    return _showLogin
-        ? LoginWidget(onSwitch: _toggle, onToggleTheme: widget.onToggleTheme)
-        : SignupWidget(onSwitch: _toggle, onToggleTheme: widget.onToggleTheme);
+    return Scaffold(
+      body: _isLogin
+          ? LoginWidget(
+              onSwitch: () => setState(() => _isLogin = false),
+              onToggleTheme: widget.onToggleTheme,
+            )
+          : SignupWidget(
+              onSwitch: () => setState(() => _isLogin = true),
+              onToggleTheme: widget.onToggleTheme,
+            ),
+    );
   }
 }
 
 class LoginWidget extends StatefulWidget {
   final VoidCallback onSwitch;
   final VoidCallback onToggleTheme;
-  const LoginWidget(
-      {Key? key, required this.onSwitch, required this.onToggleTheme})
-      : super(key: key);
+
+  const LoginWidget({
+    super.key,
+    required this.onSwitch,
+    required this.onToggleTheme,
+  });
 
   @override
   State<LoginWidget> createState() => _LoginWidgetState();
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
-  final TextEditingController emailC = TextEditingController();
-  final TextEditingController passC = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _loading = false;
+  final emailC = TextEditingController();
+  final passC = TextEditingController();
   bool _obscurePassword = true;
+  bool _loading = false;
   String? _error;
+
+  @override
+  void dispose() {
+    emailC.dispose();
+    passC.dispose();
+    super.dispose();
+  }
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() {
       _loading = true;
       _error = null;
     });
-    
+
     try {
-      final ok = await AppState.instance.signIn(emailC.text.trim(), passC.text);
-      if (!ok) {
-        setState(() {
-          _error = 'فشل في تسجيل الدخول - تحقق من البريد الإلكتروني وكلمة المرور';
-        });
-      }
+      await AppState.instance.signIn(emailC.text.trim(), passC.text);
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -74,33 +87,9 @@ class _LoginWidgetState extends State<LoginWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: ValueListenableBuilder<Locale>(
-          valueListenable: LanguageManager().currentLocale,
-          builder: (context, locale, child) {
-            return Text(LanguageManager().isArabic 
-              ? 'NeuroGuard - تسجيل الدخول' 
-              : 'NeuroGuard - Login');
-          },
-        ),
+        title: const Text('NeuroGuard - Login'),
         centerTitle: true,
         actions: [
-          // Language toggle button
-          ValueListenableBuilder<Locale>(
-            valueListenable: LanguageManager().currentLocale,
-            builder: (context, locale, child) {
-              return IconButton(
-                icon: Icon(LanguageManager().isArabic 
-                  ? Icons.language 
-                  : Icons.translate),
-                onPressed: () {
-                  LanguageManager().toggleLanguage();
-                },
-                tooltip: LanguageManager().isArabic 
-                  ? 'Switch to English' 
-                  : 'التبديل للعربية',
-              );
-            },
-          ),
           IconButton(
               icon: const Icon(Icons.brightness_6),
               onPressed: widget.onToggleTheme)
@@ -121,56 +110,37 @@ class _LoginWidgetState extends State<LoginWidget> {
                 color: Theme.of(context).primaryColor,
               ),
               const SizedBox(height: 16),
-              ValueListenableBuilder<Locale>(
-                valueListenable: LanguageManager().currentLocale,
-                builder: (context, locale, child) {
-                  return Column(
-                    children: [
-                      Text(
-                        LanguageManager().isArabic 
-                          ? 'مرحباً بك في NeuroGuard'
-                          : 'Welcome to NeuroGuard',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        LanguageManager().isArabic 
-                          ? 'نظام مراقبة الصحة العصبية الذكي'
-                          : 'Smart Neurological Health Monitoring System',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  );
-                },
+              Text(
+                'Welcome to NeuroGuard',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Smart Neurological Health Monitoring System',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
               
               // Email field
-              TextFormField(
+              SafeTextField(
                 controller: emailC,
+                labelText: 'Email',
+                prefixIcon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
                 textDirection: TextDirection.ltr,
-                decoration: InputDecoration(
-                  labelText: 'البريد الإلكتروني',
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                ),
+                textAlign: TextAlign.left,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال البريد الإلكتروني';
+                    return 'Please enter email';
                   }
                   if (!value.contains('@')) {
-                    return 'يرجى إدخال بريد إلكتروني صحيح';
+                    return 'Please enter a valid email';
                   }
                   return null;
                 },
@@ -178,35 +148,27 @@ class _LoginWidgetState extends State<LoginWidget> {
               const SizedBox(height: 16),
               
               // Password field
-              TextFormField(
+              SafeTextField(
                 controller: passC,
+                labelText: 'Password',
+                prefixIcon: Icons.lock_outlined,
                 obscureText: _obscurePassword,
                 textDirection: TextDirection.ltr,
-                decoration: InputDecoration(
-                  labelText: 'كلمة المرور',
-                  prefixIcon: const Icon(Icons.lock_outlined),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
+                textAlign: TextAlign.left,
+                suffixIcon: IconButton(
+                  icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال كلمة المرور';
+                    return 'Please enter password';
                   }
                   if (value.length < 6) {
-                    return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                    return 'Password must be at least 6 characters';
                   }
                   return null;
                 },
@@ -253,7 +215,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Text(
-                        'تسجيل الدخول',
+                        'Sign In',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
               ),
@@ -262,7 +224,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               // Switch to sign up
               TextButton(
                 onPressed: widget.onSwitch,
-                child: const Text('ليس لديك حساب؟ سجل الآن'),
+                child: const Text('Don\'t have an account? Sign up'),
               ),
               const SizedBox(height: 24),
               
@@ -277,7 +239,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                 child: Column(
                   children: [
                     Text(
-                      'حسابات تجريبية للاختبار',
+                      'Demo Accounts for Testing',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.blue[800],
@@ -290,7 +252,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                       alignment: WrapAlignment.center,
                       children: [
                         _buildDemoButton(
-                          'مريض (سارة)',
+                          'Patient (Sara)',
                           () {
                             AppState.instance.currentUser.value =
                                 Map<String, dynamic>.from(
@@ -299,7 +261,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                           Colors.green,
                         ),
                         _buildDemoButton(
-                          'مقدم رعاية (منى)',
+                          'Caregiver (Mona)',
                           () {
                             AppState.instance.currentUser.value =
                                 Map<String, dynamic>.from(
@@ -308,7 +270,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                           Colors.orange,
                         ),
                         _buildDemoButton(
-                          'طبيب (د. علي)',
+                          'Clinician (Dr. Ali)',
                           () {
                             AppState.instance.currentUser.value =
                                 Map<String, dynamic>.from(
@@ -317,7 +279,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                           Colors.blue,
                         ),
                         _buildDemoButton(
-                          'مدير',
+                          'Admin',
                           () {
                             AppState.instance.currentUser.value =
                                 Map<String, dynamic>.from(
@@ -339,25 +301,21 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   Widget _buildDemoButton(String text, VoidCallback onPressed, Color color) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minWidth: 80,
-        maxWidth: 150,
-      ),
+      constraints: const BoxConstraints(maxWidth: 120),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
         ),
         child: Text(
           text,
-          style: const TextStyle(fontSize: 11),
+          style: const TextStyle(fontSize: 10),
           textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
@@ -367,40 +325,48 @@ class _LoginWidgetState extends State<LoginWidget> {
 class SignupWidget extends StatefulWidget {
   final VoidCallback onSwitch;
   final VoidCallback onToggleTheme;
-  const SignupWidget(
-      {Key? key, required this.onSwitch, required this.onToggleTheme})
-      : super(key: key);
+
+  const SignupWidget({
+    super.key,
+    required this.onSwitch,
+    required this.onToggleTheme,
+  });
 
   @override
   State<SignupWidget> createState() => _SignupWidgetState();
 }
 
 class _SignupWidgetState extends State<SignupWidget> {
-  final TextEditingController nameC = TextEditingController();
-  final TextEditingController emailC = TextEditingController();
-  final TextEditingController passC = TextEditingController();
-  final TextEditingController confirmPassC = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String role = UserManagementService.rolePatient;
-  bool _loading = false;
+  final nameC = TextEditingController();
+  final emailC = TextEditingController();
+  final passC = TextEditingController();
+  final confirmPassC = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _loading = false;
   String? _error;
+  String role = UserManagementService.rolePatient;
+
+  @override
+  void dispose() {
+    nameC.dispose();
+    emailC.dispose();
+    passC.dispose();
+    confirmPassC.dispose();
+    super.dispose();
+  }
 
   Future<void> _signup() async {
     if (!_formKey.currentState!.validate()) return;
-    
-    final name = nameC.text.trim();
-    final email = emailC.text.trim();
-    final pass = passC.text;
-    
+
     setState(() {
       _loading = true;
       _error = null;
     });
     
     try {
-      await AppState.instance.signUp(name, email, pass, role);
+      await AppState.instance.signUp(nameC.text.trim(), emailC.text.trim(), passC.text, role);
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -412,11 +378,71 @@ class _SignupWidgetState extends State<SignupWidget> {
     }
   }
 
+  IconData _getRoleIcon(String role) {
+    switch (role) {
+      case UserManagementService.rolePatient:
+        return Icons.person;
+      case UserManagementService.roleCaregiver:
+        return Icons.family_restroom;
+      case UserManagementService.roleClinician:
+        return Icons.medical_services;
+      case UserManagementService.roleAdmin:
+        return Icons.admin_panel_settings;
+      default:
+        return Icons.person;
+    }
+  }
+
+  Color _getRoleColor(String role) {
+    switch (role) {
+      case UserManagementService.rolePatient:
+        return Colors.green;
+      case UserManagementService.roleCaregiver:
+        return Colors.orange;
+      case UserManagementService.roleClinician:
+        return Colors.blue;
+      case UserManagementService.roleAdmin:
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getEnglishRoleName(String role) {
+    switch (role) {
+      case UserManagementService.rolePatient:
+        return 'Patient';
+      case UserManagementService.roleCaregiver:
+        return 'Caregiver';
+      case UserManagementService.roleClinician:
+        return 'Clinician';
+      case UserManagementService.roleAdmin:
+        return 'Admin';
+      default:
+        return role;
+    }
+  }
+
+  String _getEnglishRoleDescription(String role) {
+    switch (role) {
+      case UserManagementService.rolePatient:
+        return 'Monitor your health';
+      case UserManagementService.roleCaregiver:
+        return 'Care for patients';
+      case UserManagementService.roleClinician:
+        return 'Provide medical care';
+      case UserManagementService.roleAdmin:
+        return 'Manage system';
+      default:
+        return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NeuroGuard - إنشاء حساب'),
+        title: const Text('NeuroGuard - Create Account'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -440,7 +466,7 @@ class _SignupWidgetState extends State<SignupWidget> {
               ),
               const SizedBox(height: 16),
               Text(
-                'إنشاء حساب جديد',
+                'Create New Account',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -448,7 +474,7 @@ class _SignupWidgetState extends State<SignupWidget> {
               ),
               const SizedBox(height: 8),
               Text(
-                'انضم إلى نظام NeuroGuard للرعاية الصحية الذكية',
+                'Join the NeuroGuard smart healthcare system',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -457,25 +483,18 @@ class _SignupWidgetState extends State<SignupWidget> {
               const SizedBox(height: 32),
               
               // Name field
-              TextFormField(
+              SafeTextField(
                 controller: nameC,
-                textDirection: TextDirection.rtl,
-                textAlign: TextAlign.right,
-                decoration: InputDecoration(
-                  labelText: 'الاسم الكامل',
-                  prefixIcon: const Icon(Icons.person_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                ),
+                labelText: 'Full Name',
+                prefixIcon: Icons.person_outlined,
+                textDirection: TextDirection.ltr,
+                textAlign: TextAlign.left,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'يرجى إدخال الاسم الكامل';
+                    return 'Please enter full name';
                   }
                   if (value.trim().length < 2) {
-                    return 'الاسم يجب أن يكون حرفين على الأقل';
+                    return 'Name must be at least 2 characters';
                   }
                   return null;
                 },
@@ -483,25 +502,19 @@ class _SignupWidgetState extends State<SignupWidget> {
               const SizedBox(height: 16),
               
               // Email field
-              TextFormField(
+              SafeTextField(
                 controller: emailC,
+                labelText: 'Email',
+                prefixIcon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
                 textDirection: TextDirection.ltr,
-                decoration: InputDecoration(
-                  labelText: 'البريد الإلكتروني',
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                ),
+                textAlign: TextAlign.left,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال البريد الإلكتروني';
+                    return 'Please enter email';
                   }
                   if (!value.contains('@')) {
-                    return 'يرجى إدخال بريد إلكتروني صحيح';
+                    return 'Please enter a valid email';
                   }
                   return null;
                 },
@@ -509,35 +522,27 @@ class _SignupWidgetState extends State<SignupWidget> {
               const SizedBox(height: 16),
               
               // Password field
-              TextFormField(
+              SafeTextField(
                 controller: passC,
+                labelText: 'Password',
+                prefixIcon: Icons.lock_outlined,
                 obscureText: _obscurePassword,
                 textDirection: TextDirection.ltr,
-                decoration: InputDecoration(
-                  labelText: 'كلمة المرور',
-                  prefixIcon: const Icon(Icons.lock_outlined),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
+                textAlign: TextAlign.left,
+                suffixIcon: IconButton(
+                  icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال كلمة المرور';
+                    return 'Please enter password';
                   }
                   if (value.length < 6) {
-                    return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                    return 'Password must be at least 6 characters';
                   }
                   return null;
                 },
@@ -545,35 +550,27 @@ class _SignupWidgetState extends State<SignupWidget> {
               const SizedBox(height: 16),
               
               // Confirm password field
-              TextFormField(
+              SafeTextField(
                 controller: confirmPassC,
+                labelText: 'Confirm Password',
+                prefixIcon: Icons.lock_outlined,
                 obscureText: _obscureConfirmPassword,
                 textDirection: TextDirection.ltr,
-                decoration: InputDecoration(
-                  labelText: 'تأكيد كلمة المرور',
-                  prefixIcon: const Icon(Icons.lock_outlined),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureConfirmPassword = !_obscureConfirmPassword;
-                      });
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
+                textAlign: TextAlign.left,
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureConfirmPassword ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _obscureConfirmPassword = !_obscureConfirmPassword;
+                    });
+                  },
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'يرجى تأكيد كلمة المرور';
+                    return 'Please confirm password';
                   }
                   if (value != passC.text) {
-                    return 'كلمة المرور غير متطابقة';
+                    return 'Passwords do not match';
                   }
                   return null;
                 },
@@ -592,7 +589,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'نوع الحساب',
+                      'Account Type',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.blue[800],
@@ -621,14 +618,14 @@ class _SignupWidgetState extends State<SignupWidget> {
                                   color: _getRoleColor(role),
                                   size: 18,
                                 ),
-                                const SizedBox(width: 6),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        UserManagementService.getRoleDisplayName(role),
+                                        _getEnglishRoleName(role),
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
@@ -637,7 +634,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                         maxLines: 1,
                                       ),
                                       Text(
-                                        UserManagementService.getRoleDescription(role),
+                                        _getEnglishRoleDescription(role),
                                         style: TextStyle(
                                           fontSize: 10,
                                           color: Colors.grey[600],
@@ -700,7 +697,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Text(
-                        'إنشاء الحساب',
+                        'Create Account',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
               ),
@@ -709,42 +706,12 @@ class _SignupWidgetState extends State<SignupWidget> {
               // Switch to login
               TextButton(
                 onPressed: widget.onSwitch,
-                child: const Text('لديك حساب بالفعل؟ سجل دخول'),
+                child: const Text('Already have an account? Sign in'),
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  IconData _getRoleIcon(String role) {
-    switch (role) {
-      case UserManagementService.rolePatient:
-        return Icons.person;
-      case UserManagementService.roleCaregiver:
-        return Icons.family_restroom;
-      case UserManagementService.roleClinician:
-        return Icons.medical_services;
-      case UserManagementService.roleAdmin:
-        return Icons.admin_panel_settings;
-      default:
-        return Icons.person;
-    }
-  }
-
-  Color _getRoleColor(String role) {
-    switch (role) {
-      case UserManagementService.rolePatient:
-        return Colors.green;
-      case UserManagementService.roleCaregiver:
-        return Colors.orange;
-      case UserManagementService.roleClinician:
-        return Colors.blue;
-      case UserManagementService.roleAdmin:
-        return Colors.purple;
-      default:
-        return Colors.grey;
-    }
   }
 }
