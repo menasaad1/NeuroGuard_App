@@ -46,78 +46,15 @@ class _LoginWidgetState extends State<LoginWidget> {
       _loading = true;
       _error = null;
     });
-    
-    try {
-      final ok = await AppState.instance.signIn(emailC.text.trim(), passC.text);
+    final ok = await AppState.instance.signIn(emailC.text.trim(), passC.text);
+    setState(() {
+      _loading = false;
+    });
+    if (!ok) {
       setState(() {
-        _loading = false;
-      });
-      if (!ok) {
-        setState(() {
-          _error = 'Login failed. Please check your credentials and try again.';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _loading = false;
-        _error = 'Login failed: ${e.toString()}';
+        _error = 'Login failed — use demo emails or sign up.';
       });
     }
-  }
-
-  Future<void> _showForgotPassword() async {
-    final emailController = TextEditingController();
-    
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset Password'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Enter your email address to receive a password reset link.'),
-            const SizedBox(height: 16),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                prefixIcon: Icon(Icons.email),
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (emailController.text.trim().isNotEmpty) {
-                try {
-                  // TODO: Implement password reset using Firebase Auth Service
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Password reset email sent! Check your inbox.'),
-                    ),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error: ${e.toString()}'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text('Send Reset Email'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -159,11 +96,6 @@ class _LoginWidgetState extends State<LoginWidget> {
                     child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.login),
             label: const Text('Login'),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: _showForgotPassword,
-            child: const Text('Forgot Password?'),
           ),
           TextButton(
               onPressed: widget.onSwitch,
@@ -231,30 +163,20 @@ class _SignupWidgetState extends State<SignupWidget> {
     final name = nameC.text.trim();
     final email = emailC.text.trim();
     final pass = passC.text;
-    
     if (name.isEmpty || !email.contains('@') || pass.length < 6) {
       setState(() {
-        _error = 'Please provide valid details and password (minimum 6 characters)';
+        _error = 'Provide valid details and password >=6 chars';
       });
       return;
     }
-    
     setState(() {
       _loading = true;
       _error = null;
     });
-    
-    try {
-      await AppState.instance.signUp(name, email, pass, role);
-      setState(() {
-        _loading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _loading = false;
-        _error = 'Sign up failed: ${e.toString()}';
-      });
-    }
+    await AppState.instance.signUp(name, email, pass, role);
+    setState(() {
+      _loading = false;
+    });
   }
 
   @override
@@ -294,32 +216,6 @@ class _SignupWidgetState extends State<SignupWidget> {
             ],
             onChanged: (v) => setState(() => role = v ?? 'patient'),
             decoration: const InputDecoration(labelText: 'Role'),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue.shade200),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Smart Role Detection:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  '• Admin: @neuroguard.com, @hospital.admin\n'
-                  '• Clinician: dr.@, @clinic., @hospital., @medical.\n'
-                  '• Caregiver: caregiver@, nurse@, @care., @support.\n'
-                  '• Patient: All other emails',
-                  style: TextStyle(fontSize: 11),
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 12),
           if (_error != null)

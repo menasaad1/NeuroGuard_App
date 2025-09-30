@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
-import 'firebase_options.dart';
 import 'state/app_state.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth_screen.dart';
@@ -10,17 +7,9 @@ import 'screens/caregiver/caregiver_home.dart';
 import 'screens/clinician/clinician_home.dart';
 import 'screens/admin/admin_home.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
-  // Initialize app state
   AppState.instance.initialize();
-  
   runApp(const NeuroGuardApp());
 }
 
