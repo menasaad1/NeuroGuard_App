@@ -596,60 +596,66 @@ class _SignupWidgetState extends State<SignupWidget> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      value: role,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      items: UserManagementService.availableRoles.map((role) {
-                        return DropdownMenuItem(
-                          value: role,
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 280),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _getRoleIcon(role),
-                                  color: _getRoleColor(role),
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        _getEnglishRoleName(role),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                      Text(
-                                        _getEnglishRoleDescription(role),
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.grey[600],
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                     DropdownButtonFormField<String>(
+                       value: role,
+                       isExpanded: true,
+                       decoration: InputDecoration(
+                         border: OutlineInputBorder(
+                           borderRadius: BorderRadius.circular(8),
+                         ),
+                         filled: true,
+                         fillColor: Colors.white,
+                       ),
+                       items: UserManagementService.availableRoles.map((role) {
+                         return DropdownMenuItem(
+                           value: role,
+                           child: Container(
+                             constraints: const BoxConstraints(maxWidth: 250),
+                             child: Row(
+                               mainAxisSize: MainAxisSize.min,
+                               children: [
+                                 Icon(
+                                   _getRoleIcon(role),
+                                   color: _getRoleColor(role),
+                                   size: 16,
+                                 ),
+                                 const SizedBox(width: 6),
+                                 Expanded(
+                                   child: Column(
+                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                     mainAxisSize: MainAxisSize.min,
+                                     textDirection: TextDirection.ltr,
+                                     children: [
+                                       Text(
+                                         _getEnglishRoleName(role),
+                                         style: const TextStyle(
+                                           fontWeight: FontWeight.bold,
+                                           fontSize: 12,
+                                         ),
+                                         textDirection: TextDirection.ltr,
+                                         textAlign: TextAlign.left,
+                                         overflow: TextOverflow.ellipsis,
+                                         maxLines: 1,
+                                       ),
+                                       Text(
+                                         _getEnglishRoleDescription(role),
+                                         style: TextStyle(
+                                           fontSize: 9,
+                                           color: Colors.grey[600],
+                                         ),
+                                         textDirection: TextDirection.ltr,
+                                         textAlign: TextAlign.left,
+                                         overflow: TextOverflow.ellipsis,
+                                         maxLines: 1,
+                                       ),
+                                     ],
+                                   ),
+                                 ),
+                               ],
+                             ),
+                           ),
+                         );
+                       }).toList(),
                       onChanged: (v) => setState(() => role = v ?? UserManagementService.rolePatient),
                     ),
                   ],

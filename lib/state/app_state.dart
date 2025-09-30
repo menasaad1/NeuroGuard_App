@@ -208,7 +208,10 @@ class AppState {
 
   Future<void> signOut() async {
     try {
-      // Clear user data first
+      // Sign out from Firebase first
+      await _authService.signOut();
+      
+      // Clear user data
       currentUser.value = null;
       
       // Reset vitals to default
@@ -226,14 +229,22 @@ class AppState {
       // Clear events
       events.value = [];
       
-      // Sign out from Firebase
-      await _authService.signOut();
-      
       print('User signed out successfully');
     } catch (e) {
       print('Sign out error: $e');
       // Force clear user data even if Firebase signout fails
       currentUser.value = null;
+      vitals.value = {
+        'eeg': 'normal',
+        'heartRate': 74,
+        'spo2': 97,
+        'motion': 'stable',
+        'score': 0.03,
+        'history_hr': List.generate(30, (_) => 60 + _rnd.nextInt(50)),
+        'history_spo2': List.generate(30, (_) => 90 + _rnd.nextInt(8)),
+        'lastUpdated': DateTime.now().toIso8601String(),
+      };
+      events.value = [];
     }
   }
 
