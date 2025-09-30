@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/notification_mock.dart';
 import '../services/escalation_mock.dart';
-import '../services/simple_auth_service.dart';
+import '../services/mobile_auth_service.dart';
 
 class AppState {
   AppState._internal();
@@ -25,7 +25,7 @@ class AppState {
 
   final Random _rnd = Random();
   Timer? _telemetryTimer;
-  final SimpleAuthService _authService = SimpleAuthService();
+  final MobileAuthService _authService = MobileAuthService();
   StreamSubscription<User?>? _authSubscription;
 
   void initialize() {
