@@ -1,6 +1,0 @@
-@echo off
-echo Starting NeuroGuard App with fixed text rendering...
-echo.
-echo Running with CanvasKit renderer for better text support...
-flutter run -d chrome --web-renderer canvaskit
-pause

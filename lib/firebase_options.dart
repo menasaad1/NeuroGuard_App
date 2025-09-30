@@ -48,6 +48,7 @@ class DefaultFirebaseOptions {
   storageBucket: "neuroguard-82e63.firebasestorage.app",
   messagingSenderId: "470690299791",
   appId: "1:470690299791:web:ef0f0b2a798a9f7e9995fa"
+
   );
 
   static const FirebaseOptions android = FirebaseOptions(
