@@ -54,16 +54,16 @@ class _LoginWidgetState extends State<LoginWidget> {
     });
     
     try {
-      final ok = await AppState.instance.signIn(emailC.text.trim(), passC.text);
+    final ok = await AppState.instance.signIn(emailC.text.trim(), passC.text);
       if (!ok) {
         setState(() {
           _error = 'فشل في تسجيل الدخول - تحقق من البريد الإلكتروني وكلمة المرور';
         });
       }
     } catch (e) {
-      setState(() {
+    setState(() {
         _error = e.toString();
-      });
+    });
     } finally {
       setState(() {
         _loading = false;
@@ -131,7 +131,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               
               // Email field
               TextFormField(
-                controller: emailC,
+              controller: emailC,
                 keyboardType: TextInputType.emailAddress,
                 textDirection: TextDirection.ltr,
                 decoration: InputDecoration(
@@ -157,7 +157,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               
               // Password field
               TextFormField(
-                controller: passC,
+              controller: passC,
                 obscureText: _obscurePassword,
                 textDirection: TextDirection.ltr,
                 decoration: InputDecoration(
@@ -192,7 +192,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               const SizedBox(height: 24),
               
               // Error message
-              if (_error != null)
+          if (_error != null)
                 Container(
                   padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.only(bottom: 16),
@@ -217,7 +217,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               
               // Login button
               ElevatedButton(
-                onPressed: _loading ? null : _login,
+            onPressed: _loading ? null : _login,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -225,7 +225,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                   ),
                 ),
                 child: _loading
-                    ? const SizedBox(
+                ? const SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
@@ -238,8 +238,8 @@ class _LoginWidgetState extends State<LoginWidget> {
               const SizedBox(height: 16),
               
               // Switch to sign up
-              TextButton(
-                onPressed: widget.onSwitch,
+          TextButton(
+              onPressed: widget.onSwitch,
                 child: const Text('ليس لديك حساب؟ سجل الآن'),
               ),
               const SizedBox(height: 24),
@@ -270,37 +270,37 @@ class _LoginWidgetState extends State<LoginWidget> {
                         _buildDemoButton(
                           'مريض (سارة)',
                           () {
-                            AppState.instance.currentUser.value =
-                                Map<String, dynamic>.from(
-                                    AppState.instance.users['pt_sara']!);
-                          },
+                  AppState.instance.currentUser.value =
+                      Map<String, dynamic>.from(
+                          AppState.instance.users['pt_sara']!);
+                },
                           Colors.green,
                         ),
                         _buildDemoButton(
                           'مقدم رعاية (منى)',
                           () {
-                            AppState.instance.currentUser.value =
-                                Map<String, dynamic>.from(
-                                    AppState.instance.users['cg_mona']!);
-                          },
+                  AppState.instance.currentUser.value =
+                      Map<String, dynamic>.from(
+                          AppState.instance.users['cg_mona']!);
+                },
                           Colors.orange,
                         ),
                         _buildDemoButton(
                           'طبيب (د. علي)',
                           () {
-                            AppState.instance.currentUser.value =
-                                Map<String, dynamic>.from(
-                                    AppState.instance.users['cl_ali']!);
-                          },
+                  AppState.instance.currentUser.value =
+                      Map<String, dynamic>.from(
+                          AppState.instance.users['cl_ali']!);
+                },
                           Colors.blue,
                         ),
                         _buildDemoButton(
                           'مدير',
                           () {
-                            AppState.instance.currentUser.value =
-                                Map<String, dynamic>.from(
-                                    AppState.instance.users['ad_admin']!);
-                          },
+                  AppState.instance.currentUser.value =
+                      Map<String, dynamic>.from(
+                          AppState.instance.users['ad_admin']!);
+                },
                           Colors.purple,
                         ),
                       ],
@@ -378,15 +378,15 @@ class _SignupWidgetState extends State<SignupWidget> {
     });
     
     try {
-      await AppState.instance.signUp(name, email, pass, role);
+    await AppState.instance.signUp(name, email, pass, role);
     } catch (e) {
       setState(() {
         _error = e.toString();
       });
     } finally {
-      setState(() {
-        _loading = false;
-      });
+    setState(() {
+      _loading = false;
+    });
     }
   }
 
@@ -436,7 +436,7 @@ class _SignupWidgetState extends State<SignupWidget> {
               
               // Name field
               TextFormField(
-                controller: nameC,
+              controller: nameC,
                 textDirection: TextDirection.rtl,
                 textAlign: TextAlign.right,
                 style: TextUtils.getSafeTextStyle(),
@@ -463,7 +463,7 @@ class _SignupWidgetState extends State<SignupWidget> {
               
               // Email field
               TextFormField(
-                controller: emailC,
+              controller: emailC,
                 keyboardType: TextInputType.emailAddress,
                 textDirection: TextDirection.ltr,
                 decoration: InputDecoration(
@@ -489,7 +489,7 @@ class _SignupWidgetState extends State<SignupWidget> {
               
               // Password field
               TextFormField(
-                controller: passC,
+              controller: passC,
                 obscureText: _obscurePassword,
                 textDirection: TextDirection.ltr,
                 decoration: InputDecoration(
@@ -578,8 +578,8 @@ class _SignupWidgetState extends State<SignupWidget> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      value: role,
+          DropdownButtonFormField<String>(
+            value: role,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -640,7 +640,7 @@ class _SignupWidgetState extends State<SignupWidget> {
               const SizedBox(height: 24),
               
               // Error message
-              if (_error != null)
+          if (_error != null)
                 Container(
                   padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.only(bottom: 16),
@@ -665,7 +665,7 @@ class _SignupWidgetState extends State<SignupWidget> {
               
               // Sign up button
               ElevatedButton(
-                onPressed: _loading ? null : _signup,
+              onPressed: _loading ? null : _signup,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -673,7 +673,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                   ),
                 ),
                 child: _loading
-                    ? const SizedBox(
+                  ? const SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
@@ -686,8 +686,8 @@ class _SignupWidgetState extends State<SignupWidget> {
               const SizedBox(height: 16),
               
               // Switch to login
-              TextButton(
-                onPressed: widget.onSwitch,
+          TextButton(
+              onPressed: widget.onSwitch,
                 child: const Text('لديك حساب بالفعل؟ سجل دخول'),
               ),
             ],

@@ -56,28 +56,52 @@ class _NeuroGuardAppState extends State<NeuroGuardApp> {
       supportedLocales: L10n.supportedLocales,
       localizationsDelegates: L10n.localizationsDelegates,
       localeResolutionCallback: L10n.localeResolutionCallback,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        scaffoldBackgroundColor: Colors.grey[50],
-        fontFamily: 'Arial', // Use Arial for better Arabic support
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontFamily: 'Arial'),
-          bodyMedium: TextStyle(fontFamily: 'Arial'),
-          bodySmall: TextStyle(fontFamily: 'Arial'),
-        ),
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.teal, brightness: Brightness.dark),
-        fontFamily: 'Arial', // Use Arial for better Arabic support
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontFamily: 'Arial'),
-          bodyMedium: TextStyle(fontFamily: 'Arial'),
-          bodySmall: TextStyle(fontFamily: 'Arial'),
-        ),
-      ),
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+            scaffoldBackgroundColor: Colors.grey[50],
+            fontFamily: 'Arial',
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(
+                fontFamily: 'Arial',
+                height: 1.2,
+                letterSpacing: 0.0,
+              ),
+              bodyMedium: TextStyle(
+                fontFamily: 'Arial',
+                height: 1.2,
+                letterSpacing: 0.0,
+              ),
+              bodySmall: TextStyle(
+                fontFamily: 'Arial',
+                height: 1.2,
+                letterSpacing: 0.0,
+              ),
+            ),
+          ),
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.teal, brightness: Brightness.dark),
+            fontFamily: 'Arial',
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(
+                fontFamily: 'Arial',
+                height: 1.2,
+                letterSpacing: 0.0,
+              ),
+              bodyMedium: TextStyle(
+                fontFamily: 'Arial',
+                height: 1.2,
+                letterSpacing: 0.0,
+              ),
+              bodySmall: TextStyle(
+                fontFamily: 'Arial',
+                height: 1.2,
+                letterSpacing: 0.0,
+              ),
+            ),
+          ),
       home: Builder(builder: (ctx) {
         if (!_seenOnboarding) {
           return OnboardingScreen(onFinish: _setSeenOnboarding);
