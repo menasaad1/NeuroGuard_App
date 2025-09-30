@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 
-class FirebaseAuthService {
-  static final FirebaseAuthService _instance = FirebaseAuthService._internal();
-  factory FirebaseAuthService() => _instance;
-  FirebaseAuthService._internal();
+class SimpleAuthService {
+  static final SimpleAuthService _instance = SimpleAuthService._internal();
+  factory SimpleAuthService() => _instance;
+  SimpleAuthService._internal();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -260,49 +260,6 @@ class FirebaseAuthService {
     }
   }
 
-  // Update user profile
-  Future<Map<String, dynamic>> updateProfile({
-    String? name,
-    String? email,
-  }) async {
-    try {
-      final User? user = _auth.currentUser;
-      if (user == null) {
-        return {'success': false, 'message': 'No user signed in'};
-      }
-
-      if (name != null) {
-        await user.updateDisplayName(name);
-      }
-
-      if (email != null) {
-        await user.updateEmail(email);
-      }
-
-      // Update Firestore document
-      final updateData = <String, dynamic>{};
-      if (name != null) updateData['name'] = name;
-      if (email != null) updateData['email'] = email;
-
-      if (updateData.isNotEmpty) {
-        await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .update(updateData);
-      }
-
-      return {
-        'success': true,
-        'message': 'Profile updated successfully!',
-      };
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'An error occurred while updating profile: ${e.toString()}',
-      };
-    }
-  }
-
   // Get user data from Firestore
   Future<Map<String, dynamic>?> getUserData(String uid) async {
     try {
@@ -320,32 +277,6 @@ class FirebaseAuthService {
         print('Error getting user data: $e');
       }
       return null;
-    }
-  }
-
-  // Delete user account
-  Future<Map<String, dynamic>> deleteAccount() async {
-    try {
-      final User? user = _auth.currentUser;
-      if (user == null) {
-        return {'success': false, 'message': 'No user signed in'};
-      }
-
-      // Delete user document from Firestore
-      await _firestore.collection('users').doc(user.uid).delete();
-
-      // Delete user from Firebase Auth
-      await user.delete();
-
-      return {
-        'success': true,
-        'message': 'Account deleted successfully!',
-      };
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'An error occurred while deleting account: ${e.toString()}',
-      };
     }
   }
 }
