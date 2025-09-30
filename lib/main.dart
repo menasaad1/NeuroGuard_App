@@ -7,9 +7,9 @@ import 'screens/caregiver/caregiver_home.dart';
 import 'screens/clinician/clinician_home.dart';
 import 'screens/admin/admin_home.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppState.instance.initialize();
+  AppState.instance.initialize();
   runApp(const NeuroGuardApp());
 }
 
