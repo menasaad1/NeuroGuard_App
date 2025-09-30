@@ -45,15 +45,22 @@ class _NeuroGuardAppState extends State<NeuroGuardApp> {
       title: 'NeuroGuard',
       debugShowCheckedModeBanner: false,
       themeMode: _dark ? ThemeMode.dark : ThemeMode.light,
+      locale: const Locale('ar', 'EG'), // Set Arabic locale
+      supportedLocales: const [
+        Locale('ar', 'EG'), // Arabic
+        Locale('en', 'US'), // English
+      ],
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         scaffoldBackgroundColor: Colors.grey[50],
+        fontFamily: 'Arial', // Use Arial for better Arabic support
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.teal, brightness: Brightness.dark),
+        fontFamily: 'Arial', // Use Arial for better Arabic support
       ),
       home: Builder(builder: (ctx) {
         if (!_seenOnboarding) {

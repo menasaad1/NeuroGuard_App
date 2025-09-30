@@ -7,8 +7,8 @@ class WebConfig {
       // Configure web-specific settings
       debugPrint('Configuring web renderer for NeuroGuard App');
       
-      // Set text direction for Arabic support
-      WidgetsBinding.instance.platformDispatcher.locale = const Locale('ar', 'EG');
+      // Note: Locale setting is handled by the app's MaterialApp widget
+      // No need to set platformDispatcher.locale directly
     }
   }
 }
