@@ -121,20 +121,33 @@ class _LoginWidgetState extends State<LoginWidget> {
                 color: Theme.of(context).primaryColor,
               ),
               const SizedBox(height: 16),
-              Text(
-                'مرحباً بك في NeuroGuard',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'نظام مراقبة الصحة العصبية الذكي',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.grey[600],
-                ),
-                textAlign: TextAlign.center,
+              ValueListenableBuilder<Locale>(
+                valueListenable: LanguageManager().currentLocale,
+                builder: (context, locale, child) {
+                  return Column(
+                    children: [
+                      Text(
+                        LanguageManager().isArabic 
+                          ? 'مرحباً بك في NeuroGuard'
+                          : 'Welcome to NeuroGuard',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        LanguageManager().isArabic 
+                          ? 'نظام مراقبة الصحة العصبية الذكي'
+                          : 'Smart Neurological Health Monitoring System',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 32),
               
